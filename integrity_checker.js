@@ -3,34 +3,36 @@
  * Creates a new hash of all files and compares the results
  * to integrity.json.
  */
- const fs = require("fs");
- const { resolve } = require('path');
- const { readdir } = require('fs').promises;
- const crypto = require('crypto')
- const hashArray = [];
- let integrityDataHash = null;
- let integritySum = crypto.createHash('sha256');
- const { exec } = require("child_process");
+const fs = require("fs");
+const { resolve } = require('path');
+const { readdir } = require('fs').promises;
+const crypto = require('crypto')
+const hashArray = [];
+let integrityDataHash = null;
+let integritySum = crypto.createHash('sha256');
+const { exec } = require("child_process");
+const md5 = require('md5');
 
- try{
-    let data = fs.readFileSync('./integrity.json', 'utf8');
-    integritySum.update(data);
-    integrityDataHash = integritySum.digest('hex');
- }catch(error){
-     throw Error(error);
- };
+ 
+try{
+    let buffer = fs.readFileSync('./integrity.json');
+    integrityDataHash = md5(buffer.toString());
+}
+catch(error){
+    throw Error(error);
+};
 
- async function* getFiles(dir) {
-     const dirents = await readdir(dir, { withFileTypes: true });
-     for (const dirent of dirents) {
-       const res = resolve(dir, dirent.name);
-       if (dirent.isDirectory()) {
-         yield* getFiles(res);
-       } else {
-         yield res;
-       }
-     }
- }
+async function* getFiles(dir) {
+    const dirents = await readdir(dir, { withFileTypes: true });
+    for (const dirent of dirents) {
+        const res = resolve(dir, dirent.name);
+        if (dirent.isDirectory()) {
+            yield* getFiles(res);
+        } else {
+            yield res;
+        }
+    }
+}
  
 ;(async () => {
     for await (const f of getFiles('.')) {
@@ -41,17 +43,13 @@
             f.indexOf('lock') === -1 &&
             f.indexOf('integrity.json') === -1
         ){
-            let hashSum = crypto.createHash('sha256');
-            let fileBuffer = fs.readFileSync(`${f}`);
-            hashSum.update(fileBuffer);
-            let hex = hashSum.digest('hex')
-            hashArray.push(hex);
+            let buffer = fs.readFileSync(f);
+            let hash = md5(buffer.toString());
+            hashArray.push(hash);
         }
     }
-
-    let hashArraySum = crypto.createHash('sha256');
-    hashArraySum.update(JSON.stringify(hashArray));
-    let hashArrayHash = hashArraySum.digest('hex')
+    
+    let hashArrayHash = md5(JSON.stringify(hashArray))
 
     console.log(hashArrayHash)
     console.log(integrityDataHash)
@@ -76,4 +74,4 @@
          console.error(error)
          process.exit(1);
     }
- })()
+})()
