@@ -32,28 +32,31 @@
      }
  }
  
- ;(async () => {
-     for await (const f of getFiles('.')) {
-         if(
-             f.indexOf('node_modules') === -1 && 
-             f.indexOf('.git') === -1 && 
-             f.indexOf('.gitignore') === -1 &&
-             f.indexOf('lock') === -1 &&
-             f.indexOf('integrity.json') === -1
-         ){
-             let hashSum = crypto.createHash('sha256');
-             let fileBuffer = fs.readFileSync(`${f}`);
-             hashSum.update(fileBuffer);
-             let hex = hashSum.digest('hex')
-             hashArray.push({path:`${f}`, hash: hex});
-         }
-     }
+;(async () => {
+    for await (const f of getFiles('.')) {
+        if(
+            f.indexOf('node_modules') === -1 && 
+            f.indexOf('.git') === -1 && 
+            f.indexOf('.gitignore') === -1 &&
+            f.indexOf('lock') === -1 &&
+            f.indexOf('integrity.json') === -1
+        ){
+            let hashSum = crypto.createHash('sha256');
+            let fileBuffer = fs.readFileSync(`${f}`);
+            hashSum.update(fileBuffer);
+            let hex = hashSum.digest('hex')
+            hashArray.push({path:`${f}`, hash: hex});
+        }
+    }
 
-     let hashArraySum = crypto.createHash('sha256');
-     hashArraySum.update(JSON.stringify(hashArray));
-     let hashArrayHash = hashArraySum.digest('hex')
+    let hashArraySum = crypto.createHash('sha256');
+    hashArraySum.update(JSON.stringify(hashArray));
+    let hashArrayHash = hashArraySum.digest('hex')
 
-     try{
+    console.log(hashArrayHash)
+    console.log(integrityDataHash)
+
+    try{
         if(hashArrayHash !== integrityDataHash){
             throw new Error('The integrity of this software is compromised. Please contact the author for a valid copy.');
         }else{
@@ -69,8 +72,8 @@
                 process.exit(1);
             });
         }
-     }catch(error){
+    }catch(error){
          console.error(error)
          process.exit(1);
-     }
+    }
  })()
