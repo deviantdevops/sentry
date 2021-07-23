@@ -42,7 +42,9 @@ async function* getFiles(dir) {
             f.indexOf('.git') === -1 && 
             f.indexOf('.gitignore') === -1 &&
             f.indexOf('lock') === -1 &&
-            f.indexOf('integrity.json') === -1
+            f.indexOf('integrity.json') === -1 &&
+            f.indexOf('gpg') === -1 &&
+            f.indexOf('hashmaker.js') === -1
         ){
             let buffer = fs.readFileSync(f);
             collectiveContent += buffer.toString()
