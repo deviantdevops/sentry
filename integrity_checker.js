@@ -16,7 +16,7 @@ const md5 = require('md5');
  
 try{
     let buffer = fs.readFileSync('./integrity.json');
-    integrityDataHash = md5(buffer.toString());
+    integrityDataHash = buffer.toString();
 }
 catch(error){
     throw Error(error);
@@ -35,7 +35,8 @@ async function* getFiles(dir) {
 }
  
 ;(async () => {
-    for await (const f of getFiles('.')) {
+    let collectiveContent = '';
+    for await (const f of getFiles('.')) {    
         if(
             f.indexOf('node_modules') === -1 && 
             f.indexOf('.git') === -1 && 
@@ -44,18 +45,17 @@ async function* getFiles(dir) {
             f.indexOf('integrity.json') === -1
         ){
             let buffer = fs.readFileSync(f);
-            let hash = md5(buffer.toString());
-            hashArray.push(hash);
+            collectiveContent += buffer.toString()
         }
     }
+    let hash = md5(collectiveContent)
     
-    let hashArrayHash = md5(JSON.stringify(hashArray))
 
-    console.log(hashArrayHash)
+    console.log(hash)
     console.log(integrityDataHash)
 
     try{
-        if(hashArrayHash !== integrityDataHash){
+        if(hash !== integrityDataHash){
             throw new Error('The integrity of this software is compromised. Please contact the author for a valid copy.');
         }else{
             console.log('INTEGRITY CHECK HAS PASSED!')
