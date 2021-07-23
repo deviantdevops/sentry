@@ -1,0 +1,40 @@
+version: '3.1'
+
+services:
+  gatekeeper:
+    image: "deviant.code:5000/sentry:3.0.0"
+    user: "node"
+    working_dir: /home/node/app
+    restart: always
+    deploy:
+      labels:
+        traefik.enable: "true"
+        traefik.docker.network: frontend
+        traefik.http.routers.gatekeeper.entrypoints: web, websecure
+        traefik.http.routers.gatekeeper.tls: "true"
+        traefik.http.routers.gatekeeper.rule: Host(`sentry.deviant.code`)
+        traefik.http.services.gatekeeper.loadbalancer.server.port: 7006
+        traefik.http.routers.gatekeeper.tls.certresolver: le
+        traefik.http.routers.gatekeeper.tls.domains[0].main: "sentry.deviant.code"
+
+        ## Middleware redirect
+        traefik.http.middlewares.https_redirect.redirectscheme.scheme: https
+        traefik.http.middlewares.https_redirect.redirectscheme.permanent: "true"
+    ports:
+      - 7006:7006
+    networks:
+      - frontend
+      - backend
+      - redis
+      - key
+    command: "npm run prod"
+
+networks:
+  frontend:
+    external: true
+  backend:
+    external: true
+  redis:
+    external: true
+  key:
+    external: true

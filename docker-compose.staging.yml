@@ -1,0 +1,40 @@
+version: '3.1'
+
+services:
+  gatekeeper:
+    image: "registry.iron-labs.de/gatekeeper:2.1.0"
+    user: "node"
+    working_dir: /home/node/app
+    restart: always
+    deploy:
+      labels:
+        traefik.enable: "true"
+        traefik.docker.network: frontend
+        traefik.http.routers.gatekeeper.entrypoints: web, websecure
+        traefik.http.routers.gatekeeper.tls: "true"
+        traefik.http.routers.gatekeeper.rule: Host(`gatekeeper.iron-labs.de`)
+        traefik.http.services.gatekeeper.loadbalancer.server.port: 7001
+        traefik.http.routers.gatekeeper.tls.certresolver: le
+        traefik.http.routers.gatekeeper.tls.domains[0].main: "gatekeeper.iron-labs.de"
+
+        ## Middleware redirect
+        traefik.http.middlewares.https_redirect.redirectscheme.scheme: https
+        traefik.http.middlewares.https_redirect.redirectscheme.permanent: "true"
+    ports:
+      - 7001:7001
+    networks:
+      - frontend
+      - backend
+      - redis
+      - key
+    command: "npm run prod"
+
+networks:
+  frontend:
+    external: true
+  backend:
+    external: true
+  redis:
+    external: true
+  key:
+    external: true
