@@ -45,7 +45,7 @@
             let fileBuffer = fs.readFileSync(`${f}`);
             hashSum.update(fileBuffer);
             let hex = hashSum.digest('hex')
-            hashArray.push({path:`${f}`, hash: hex});
+            hashArray.push(hex);
         }
     }
 
