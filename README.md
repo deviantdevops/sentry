@@ -25,6 +25,25 @@ Add npm packages
     yarn install
 ```
 
+## INTEGRITY
+DevOps @Deviant.code signs all code with intrgrity hashing to detect code changes. Our code is uploaded via private key ssh and also signed in our GitHub account. Any contributors can submit new code, BUT beofre commit & merge, code must be reviewed and GPG signed by @DevOps. In addition to standard GitHub verification, we also provide the following:
+
+Running the folloiwng command in the Sentry directory will got get our GPG key for you and verify the integrity of the software. FIrst it will compare a fresh hash of Sentry with a saved hash. THen it will verify the GPG signatures. 
+
+```bash 
+    node integrity_checker.js
+```
+
+You should see both:
+
+```bash 
+    INTEGRITY CHECK HAS PASSED!
+    ...
+    gpg: Good signature from ...
+```
+
+If so then all good.
+
 ## Configuration
 
 Sentry needs to know the real location of your services.
