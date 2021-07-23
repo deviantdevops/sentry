@@ -10,3 +10,30 @@ Sentry is the sole service which can communicate with all Docker backend service
 
 Sentry requires Crypt API.
 
+
+## Installation
+
+Clone this repo
+
+```bash 
+    git clone https://github.com/deviantdevops/sentry.git sentry 
+```
+
+Add npm packages
+
+```bash 
+    yarn install
+```
+
+## Configuration
+
+Sentry needs to know the real location of your services.
+
+```bash 
+    ./lib/servers.js
+```
+Here is where you must configure the location of your services. Server.js is a JSON object which responds to various environments. For a request to be properly relayed, you must list new servers here else the request does not know where to go. When sending to Sentry, lets use this example:
+
+Lets say you want a request to go to your cart application located at http://localhost:9025/item. If you were to communicate directly with Cart, then you would talk to that address. But as Sentry stands between you and the cart API, you must tell sentry where to proxy your request to. You would instead send your request to http://localhost:7006/cart/item where "/cart" corresponds to the key value pair below and port 7006 is this application. The proxy will remove that "cart" string from the request and then come here to look for the real location of Cart and then send the rest of the request forward. The finaly request will be http://localhost:9025/item
+
+
