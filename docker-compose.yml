@@ -1,8 +1,8 @@
 version: '3.1'
 
 services:
-  api_tax:
-    image: "darkcodz.com:5000/api/tax:1.0.0"
+  sentry:
+    image: "deviant.code:5000/sentry:3.0.0"
     user: "node"
     working_dir: /home/node/app
     restart: on-failure
@@ -12,14 +12,14 @@ services:
       labels:
         - traefik.enable=false
     ports:
-      - 9019:9019
+      - 7006:7006
     networks:
-      - redis
-      - mongo
+      - frontend
+      - backend
     command: "npm run dev"
 
 networks:
-  redis:
+  frontend:
     external: true
-  mongo:
+  backend:
     external: true

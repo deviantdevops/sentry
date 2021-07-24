@@ -1,7 +1,7 @@
 #!/bin/bash
 
 docker build -f app.dockerfile -t deviant.code:5000/sentry:3.0.0 .
-docker push darkcodz.com:5000/deviant.code:3.0.0
+docker push deviant.code:5000/sentry:3.0.0
 
 #Git operations
 

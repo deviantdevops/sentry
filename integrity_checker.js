@@ -7,9 +7,7 @@ const fs = require("fs");
 const { resolve } = require('path');
 const { readdir } = require('fs').promises;
 const crypto = require('crypto')
-const hashArray = [];
 let integrityDataHash = null;
-let integritySum = crypto.createHash('sha256');
 const { exec } = require("child_process");
 const md5 = require('md5');
 
@@ -51,11 +49,6 @@ async function* getFiles(dir) {
         }
     }
     let hash = md5(collectiveContent)
-    
-
-    console.log(hash)
-    console.log(integrityDataHash)
-
     try{
         if(hash !== integrityDataHash){
             throw new Error('The integrity of this software is compromised. Please contact the author for a valid copy.');
